@@ -27,7 +27,7 @@ XMoconk.hs
 ----------
 
 My desktop runs XMonad, and has a dzen2 bar to display window and workspace
-information, hardare monitors, and a clock. This is a problem, because XMonad
+information, hardware monitors, and a clock. This is a problem, because XMonad
 only responds to X events, which means you can't set it to update the clock and
 hardware monitors at regular intervals. Most people in this situation resort to
 either switching to XMobar, or using two dzen2 bars side by side. I didn't like
