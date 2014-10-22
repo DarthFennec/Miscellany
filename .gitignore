@@ -1,0 +1,6 @@
+*.hi
+*.o
+Brainfuck/brainfuck
+SAT/sat
+XMoconk/xmoconk
+XLogout/xlogout
