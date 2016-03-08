@@ -30,6 +30,7 @@ par = map k.filter (/= []).map (filter (/= ':')).groupBy g.filter (not.isSpace)
   where f x = round $ 100 - 100*2^^(-x `div` 1000)
         g x y = y /= ':'
         k xss@(x:xs)
+          | xss == "!" = 255
           | all isDigit xss = min 100 $ read xss
-          | x == '*' && all isDigit xs = f $ read xs
+          | x == '*' && all isDigit xs = min 100 $ f $ read xs
           | otherwise = 0
