@@ -16,6 +16,12 @@ Huffman.hs
 This is a simple Huffman encoder/decoder that I wrote when I learned about
 Huffman encoding. It's not particularly useful. Also written in Haskell.
 
+JsonReader.hs
+-------------
+
+This parses a JSON string. Don't use it, there are better libraries out there
+for this purpose. I wrote this because I felt like it.
+
 SAT.hs
 ------
 
