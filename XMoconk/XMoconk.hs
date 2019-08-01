@@ -47,22 +47,51 @@ par = concat.map k.splitat ':'.filter (not.isSpace)
       | otherwise = [0]
 
 cluster :: Int -> [CChar] -> [CChar]
-cluster c xs = g $ kmeans $ h
+cluster c xs = g $ kfix (initvs c xsf) xsf
   where
     xsf = map fromIntegral xs :: [Double]
-    f c1 c2 k = abs (c1 - k) < abs (c2 - k)
-    g ks = take c $ map (min 100.round) ks ++ repeat 255
-    h | c > length xsf = xsf
-      | otherwise = let n = length xsf `div` c in j n $ drop (n `div` 2) xsf
+    g (_, ks) = map (min 100.round.avg) $ maxsplit c $ filter (/= []) ks
+
+maxsplit :: Int -> [[Double]] -> [[Double]]
+maxsplit c xs
+  | c > length xs = maxsplit c $ csplit xs
+  | otherwise = take c xs
+
+csplit :: [[Double]] -> [[Double]]
+csplit vs = sp (maximum $ map length vs) vs
+  where
+    sp _ [] = []
+    sp n (x:xs)
+      | n == length x = let (y, z) = splitAt (n `div` 2) x in y:z:xs
+      | otherwise = x:sp n xs
+
+initvs :: Int -> [Double] -> [Double]
+initvs c xs
+  | c > length xs = xs
+  | otherwise = let n = length xs `div` c in j n $ drop (n `div` 2) xs
+  where
     j _ [] = []
     j n (k:ks) = k:j n (drop (n - 1) ks)
-    avg [] = 0
-    avg x = sum x / fromIntegral (length x)
-    assn (c1:c2:cs) ks = n1:assn (c2:cs) n2
-      where (n1, n2) = span (f c1 c2) ks
+
+kfix :: [Double] -> [Double] -> ([Double], [[Double]])
+kfix ms xs
+  | ms == ms' = (ms', cs)
+  | otherwise = kfix ms' xs
+  where (ms', cs) = kmeans ms xs
+
+kmeans :: [Double] -> [Double] -> ([Double], [[Double]])
+kmeans ms xs = let gs = assn ms xs in (map avg gs, gs)
+  where
+    f c1 c2 k = abs (c1 - k) < abs (c2 - k)
+    assn (c1:c2:cs) ks = let (n1, n2) = span (f c1 c2) ks in n1:assn (c2:cs) n2
     assn _ ks = [ks]
-    kmeans cs = if cs /= cs' then kmeans cs' else cs'
-      where cs' = map avg $ assn cs xsf
+
+avg :: [Double] -> Double
+avg [] = 0
+avg xs = go 0 0 xs
+  where
+    go t c [] = t/c
+    go t c (y:ys) = ((go $! (t + y)) $! (c + 1)) $ ys
 
 splitat :: Char -> String -> [String]
 splitat c = map (filter (/= c)).groupBy (\_ x -> x /= c)
